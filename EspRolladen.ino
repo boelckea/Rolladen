@@ -28,3 +28,16 @@
                 }
                 //Thread.Sleep(500);
             }
+
+
+<div id="r1" style="width: 100px; height: 300px; background-color: azure"></div>
+
+<script>
+    $(function() {
+        $("#r1").click(
+            function(e) {
+                alert(e.offsetX + " " + e.offsetY);
+            }
+        );
+    });
+</script>
