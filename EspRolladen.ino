@@ -14,12 +14,12 @@ const char* password = "ROSI29ROSI!";
 const char* host = "EspRolladen";
 
 const int ledPin = 2;
-const int r1UpPin = 12; // D6
-const int r1DownPin = 14; // D5
-const int r1DownPin = 4; // D2
-const int r1DownPin = 5; // D1
-const int r1DownPin = 13; // D7
-const int r1DownPin = 10; // 3D3?
+//const int r1UpPin = 12; // D6
+//const int r1DownPin = 14; // D5
+//const int r1UpPin = 4; // D2
+//const int r1DownPin = 5; // D1
+const int r1UpPin = 13; // D7
+const int r1DownPin = 15; // D8 nur mit 600 Ohm Pulldow extern!
 
 static unsigned long stopTimeR1Up = 0; //currentTime + 2;
 static unsigned long stopTimeR1Down = 0; // currentTime + 4;
