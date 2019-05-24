@@ -13,8 +13,13 @@ const char* ssid = "ROSID";
 const char* password = "ROSI29ROSI!";
 const char* host = "EspRolladen";
 
-const int r1UpPin = FUNC_GPIO3;
-const int r1DownPin = FUNC_GPIO2;
+const int ledPin = 2;
+const int r1UpPin = 12; // D6
+const int r1DownPin = 14; // D5
+const int r1DownPin = 4; // D2
+const int r1DownPin = 5; // D1
+const int r1DownPin = 13; // D7
+const int r1DownPin = 10; // 3D3?
 
 static unsigned long stopTimeR1Up = 0; //currentTime + 2;
 static unsigned long stopTimeR1Down = 0; // currentTime + 4;
@@ -32,10 +37,12 @@ String getServerPage() {
 }
 
 void setup(void) {
+	pinMode(ledPin, OUTPUT);
+	digitalWrite(ledPin, HIGH);
 	pinMode(r1UpPin, OUTPUT);
 	pinMode(r1DownPin, OUTPUT);
-	digitalWrite(r1UpPin, LOW);
-	digitalWrite(r1DownPin, LOW);
+	digitalWrite(r1UpPin, HIGH);
+	digitalWrite(r1DownPin, HIGH);
 
 	Serial.begin(115200);
 	Serial.println();
@@ -84,26 +91,29 @@ void loop(void) {
 	unsigned long currentTime = millis();
 	if (stopTimeR1Up > currentTime) {
 		// R1 up
+		digitalWrite(ledPin, LOW);
 		Serial.println("R1Down off");
-		digitalWrite(r1DownPin, LOW);
+		digitalWrite(r1DownPin, HIGH);
 		delay(100);
 		Serial.println("R1Up on");
-		digitalWrite(r1UpPin, HIGH);
+		digitalWrite(r1UpPin, LOW);
 	}
 	else {
 		if (stopTimeR1Down > currentTime) {
 			// R1 down
+			digitalWrite(ledPin, LOW);
 			Serial.println("R1Up off");
-			digitalWrite(r1UpPin, LOW);
+			digitalWrite(r1UpPin, HIGH);
 			delay(100);
 			Serial.println("R1DOwn on");
-			digitalWrite(r1DownPin, HIGH);
+			digitalWrite(r1DownPin, LOW);
 		}
 		else {
+			digitalWrite(ledPin, HIGH);
 			Serial.println("R1Up off");
-			digitalWrite(r1UpPin, LOW);
+			digitalWrite(r1UpPin, HIGH);
 			Serial.println("R1Down off");
-			digitalWrite(r1DownPin, LOW);
+			digitalWrite(r1DownPin, HIGH);
 			delay(100);
 		}
 	}
