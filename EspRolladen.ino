@@ -35,6 +35,7 @@ ESP8266WebServer httpServer(80);
 ESP8266HTTPUpdateServer httpUpdater;
 
 String getServerPage() {
+//<div id='r3' style='width: 100px;height: 300px;float:left;background-color: #23c5de;margin:5px;'><div style='height: 200px;background-color: #83c5de;border-bottom-style: solid;border-bottom-width: 3px;'></div></div>
 	String serverpage =
 			String("Version 5 <a href='/rolladen'>Reload Page</a><br>") +
 			"<div id='r3' style='width: 100px; height: 300px; float:left; background-color: #ea347b'></div>" +
