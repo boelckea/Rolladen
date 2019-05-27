@@ -40,8 +40,8 @@ String getServerPage() {
 			String("<!DOCTYPE html><head><meta name='viewport' content='width = device-width, initial-scale = 1.0'></head><body>") +
 			"<style .win{width: 100px; float:left; background-color: #23c5de; margin:5px;} .shutter{background-color: #83c5de; border-bottom-style: solid;border-bottom-width: 3px;}></style>" +
 			"<a href='/rolladen'>Reload Page</a><br>" +
-			"<div id='r3' class='win' style='height: 300px;'><div class='shutter' style='height: 200px;'></div>" +
-			"<script>document.getElementById('r3').addEventListener('click', function(e){document.location='/rolladen?id=3&offset=' + e.offsetY})</script>" +
+			"<div id='r3' class='win' style='height: 300px;'><div class='shutter' style='height: " + String(r3offsetInt) +"px;'></div>" +
+			"<script>document.getElementById('r3').addEventListener('click', function(e){document.location='/rolladen?id=r3&offset=' + e.offsetY})</script>" +
 			"<div id='r1' class='win' style='height: 300px;'></div>" +
 			"<script>document.getElementById('r1').addEventListener('click', function(e){document.location='/rolladen?id=1&offset=' + e.offsetY})</script>" +
 			"<div id='r2' class='win' style='height: 200px;'></div>" +
@@ -108,13 +108,13 @@ void setup(void) {
 			}
 			r2offsetIntBack = r2offsetInt;
 		}
-		if(rolladenNr == "3") {
-			int r3offsetInt = map(offset.toInt(), 0, 300, 0, 25);
+		if(rolladenNr == "r3") {
+			int r3offsetInt = offset.toInt();
 			int delta = r3offsetInt - r3offsetIntBack;
 			if(delta > 0) {
-				stopTimeR3Down = currentTime + 1000L * delta;
+				stopTimeR3Down = currentTime + 1000L * map(delta, 0, 300, 0, 25);
 			} else {
-				stopTimeR3Up = currentTime + 1000L * delta * 1.1 * -1;
+				stopTimeR3Up = currentTime + 1000L * map(delta, 0, 300, 0, 25) * 1.1 * -1;
 			}
 			r3offsetIntBack = r3offsetInt;
 		}
