@@ -35,18 +35,17 @@ ESP8266WebServer httpServer(80);
 ESP8266HTTPUpdateServer httpUpdater;
 
 String getServerPage() {
-//<div id='r3' style='width: 100px;height: 300px;float:left;background-color: #23c5de;margin:5px;'><div style='height: 200px;background-color: #83c5de;border-bottom-style: solid;border-bottom-width: 3px;'></div></div>
 	String serverpage =
 			String("<!DOCTYPE html><head><meta name='viewport' content='width = device-width, initial-scale = 1.0'></head><body>") +
-			"<style .win{width: 100px; float:left; background-color: #23c5de; margin:5px;} .shutter{background-color: #83c5de; border-bottom-style: solid;border-bottom-width: 3px;}></style>" +
+			"<style> .win{width: 100px; float:left; background-color: #23c5de; margin:5px;} .shutter{background-color: #83c5de; border-bottom-style: solid;border-bottom-width: 3px;}</style>" +
 			"<a href='/rolladen'>Reload Page</a><br>" +
-			"<div id='r3' class='win' style='height: 300px;'><div class='shutter' style='height: " + String(r3offsetInt) +"px;'></div>" +
+			"<div id='r3' class='win' style='height: 300px;'><div class='shutter' style='height: " + String(r3offsetIntBack) +"px;'></div></div>" +
 			"<script>document.getElementById('r3').addEventListener('click', function(e){document.location='/rolladen?id=r3&offset=' + e.offsetY})</script>" +
-			"<div id='r1' class='win' style='height: 300px;'></div>" +
-			"<script>document.getElementById('r1').addEventListener('click', function(e){document.location='/rolladen?id=1&offset=' + e.offsetY})</script>" +
-			"<div id='r2' class='win' style='height: 200px;'></div>" +
-			"<script>document.getElementById('r2').addEventListener('click', function(e){document.location='/rolladen?id=2&offset=' + e.offsetY})</script>" +
-			"<br> Version 6"
+			"<div id='r1' class='win' style='height: 300px;'><div class='shutter' style='height: " + String(r1offsetIntBack) +"px;'></div></div>" +
+			"<script>document.getElementById('r1').addEventListener('click', function(e){document.location='/rolladen?id=r1&offset=' + e.offsetY})</script>" +
+			"<div id='r2' class='win' style='height: 200px;'><div class='shutter' style='height: " + String(r2offsetIntBack) +"px;'></div></div>" +
+			"<script>document.getElementById('r2').addEventListener('click', function(e){document.location='/rolladen?id=r2&offset=' + e.offsetY})</script>" +
+			"<br style='clear:both'> Version 7"
 			"</body>";
 	return serverpage;
 }
@@ -88,23 +87,23 @@ void setup(void) {
 		Serial.println(String("Rolladen") + rolladenNr + " Offset " + offset);
 
 		unsigned long currentTime = millis();
-		if(rolladenNr == "1") {
-			int r1offsetInt = map(offset.toInt(), 0, 300, 0, 25);
+		if(rolladenNr == "r1") {
+			int r1offsetInt = offset.toInt();
 			int delta = r1offsetInt - r1offsetIntBack;
 			if(delta > 0) {
-				stopTimeR1Down = currentTime + 1000L * delta;
+				stopTimeR1Down = currentTime + 1000L * map(delta, 0, 300, 0, 25);
 			} else {
-				stopTimeR1Up = currentTime + 1000L * delta * 1.1 * -1;
+				stopTimeR1Up = currentTime + 1000L * map(delta, 0, 300, 0, 25) * 1.1 * -1;
 			}
 			r1offsetIntBack = r1offsetInt;
 		}
-		if(rolladenNr == "2") {
-			int r2offsetInt = map(offset.toInt(), 0, 300, 0, 25);
+		if(rolladenNr == "r2") {
+			int r2offsetInt = offset.toInt();
 			int delta = r2offsetInt - r2offsetIntBack;
 			if(delta > 0) {
-				stopTimeR2Down = currentTime + 1000L * delta;
+				stopTimeR2Down = currentTime + 1000L * map(delta, 0, 300, 0, 25);
 			} else {
-				stopTimeR2Up = currentTime + 1000L * delta * 1.1 * -1;
+				stopTimeR2Up = currentTime + 1000L * map(delta, 0, 300, 0, 25) * 1.1 * -1;
 			}
 			r2offsetIntBack = r2offsetInt;
 		}
