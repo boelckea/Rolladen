@@ -36,7 +36,7 @@ ESP8266HTTPUpdateServer httpUpdater;
 
 String getServerPage() {
 	String serverpage =
-			String("<!DOCTYPE html><head><meta name='viewport' content='width = device-width, initial-scale = 1.0'></head><body>") +
+			String("<!DOCTYPE html><head><meta name='viewport' content='width = device-width, initial-scale = 1.0'><title>RosiRolläden</title></head><body>") +
 			"<style> .win{width: 100px; float:left; background-color: #23c5de; margin:5px;} .shutter{background-color: #83c5de; border-bottom-style: solid;border-bottom-width: 3px;}</style>" +
 			"<a href='/rolladen'>Reload Page</a><br>" +
 			"<div id='r3' class='win' style='height: 300px;'><div class='shutter' style='height: " + String(r3offsetIntBack) +"px;'></div></div>" +
