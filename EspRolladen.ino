@@ -37,13 +37,17 @@ ESP8266HTTPUpdateServer httpUpdater;
 String getServerPage() {
 //<div id='r3' style='width: 100px;height: 300px;float:left;background-color: #23c5de;margin:5px;'><div style='height: 200px;background-color: #83c5de;border-bottom-style: solid;border-bottom-width: 3px;'></div></div>
 	String serverpage =
-			String("Version 5 <a href='/rolladen'>Reload Page</a><br>") +
-			"<div id='r3' style='width: 100px; height: 300px; float:left; background-color: #ea347b'></div>" +
+			String("<!DOCTYPE html><head><meta name='viewport' content='width = device-width, initial-scale = 1.0'></head><body>") +
+			"<style .win{width: 100px; float:left; background-color: #23c5de; margin:5px;} .shutter{background-color: #83c5de; border-bottom-style: solid;border-bottom-width: 3px;}></style>" +
+			"<a href='/rolladen'>Reload Page</a><br>" +
+			"<div id='r3' class='win' style='height: 300px;'><div class='shutter' style='height: 200px;'></div>" +
 			"<script>document.getElementById('r3').addEventListener('click', function(e){document.location='/rolladen?id=3&offset=' + e.offsetY})</script>" +
-			"<div id='r1' style='width: 100px; height: 300px; float:left; background-color: #eab47b'></div>" +
+			"<div id='r1' class='win' style='height: 300px;'></div>" +
 			"<script>document.getElementById('r1').addEventListener('click', function(e){document.location='/rolladen?id=1&offset=' + e.offsetY})</script>" +
-			"<div id='r2' style='width: 100px; height: 200px; float:left; background-color: #eab42b'></div>" +
-			"<script>document.getElementById('r2').addEventListener('click', function(e){document.location='/rolladen?id=2&offset=' + e.offsetY})</script>";
+			"<div id='r2' class='win' style='height: 200px;'></div>" +
+			"<script>document.getElementById('r2').addEventListener('click', function(e){document.location='/rolladen?id=2&offset=' + e.offsetY})</script>" +
+			"<br> Version 6"
+			"</body>";
 	return serverpage;
 }
 
