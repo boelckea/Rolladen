@@ -18,8 +18,8 @@ const int r1UpPin = 13; // D7
 const int r1DownPin = 15; // D8 nur mit 600 Ohm Pulldow extern!
 const int r2UpPin = 12; // D6
 const int r2DownPin = 14; // D5
-const int r3UpPin = 4; // D2
-const int r3DownPin = 5; // D1
+const int r3UpPin = 5; // D1
+const int r3DownPin = 4; // D2
 
 static unsigned long stopTimeR1Up = 0;
 static unsigned long stopTimeR1Down = 0;
