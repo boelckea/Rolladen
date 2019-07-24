@@ -81,9 +81,9 @@ void setup(void) {
 		int offsetInt = offset.toInt();
 		int delta = offsetInt - offsetIntBack[rolladenNrIndex];
 		if(delta > 0) {
-			stopTimeDown[rolladenNrIndex] = currentTime + 1000L * map(delta, 0, 300, 0, 25);
+			stopTimeDown[rolladenNrIndex] = currentTime + 1000L * map(delta, 0, 300, 0, 25) * 1.1;
 		} else {
-			stopTimeUp[rolladenNrIndex] = currentTime + 1000L * map(delta, 0, 300, 0, 25) * 1.1 * -1;
+			stopTimeUp[rolladenNrIndex] = currentTime + 1000L * map(delta, 0, 300, 0, 25) * 1.1 * -1 * 1.1;
 		}
 		offsetIntBack[rolladenNrIndex] = offsetInt;
 
@@ -120,7 +120,7 @@ void loop(void) {
 				Serial.println(" up off");
 				digitalWrite(upPin[rolIndex], HIGH);
 				delay(100);
-			Serial.print(rolIndex);
+				Serial.print(rolIndex);
 				Serial.println(" dOwn on");
 				digitalWrite(downPin[rolIndex], LOW);
 			}
