@@ -14,22 +14,17 @@ const char* password = "ROSI29ROSI!";
 const char* host = "EspRolladen";
 
 const int ledPin = 2;
-const int r1UpPin = 13; // D7
-const int r1DownPin = 15; // D8 nur mit 600 Ohm Pulldow extern!
-const int r2UpPin = 12; // D6
-const int r2DownPin = 14; // D5
-const int r3UpPin = 5; // D1
-const int r3DownPin = 4; // D2
 
-static unsigned long stopTimeR1Up = 0;
-static unsigned long stopTimeR1Down = 0;
-static int r1offsetIntBack = 0;
-static unsigned long stopTimeR2Up = 0;
-static unsigned long stopTimeR2Down = 0;
-static int r2offsetIntBack = 0;
-static unsigned long stopTimeR3Up = 0;
-static unsigned long stopTimeR3Down = 0;
-static int r3offsetIntBack = 0;
+const int upPin[3] = {13 /*D7*/, 
+		      12 /*D6*/, 
+		      5 /*D1*/};
+const int downPin[3] = {15 /*D8 nur mit 600 Ohm Pulldow extern!*/, 
+			14 /*D5*/, 
+			4 /*D2*/};
+
+static unsigned long stopTimeUp[3] = {0,0,0};
+static unsigned long stopTimeDown[3] = {0,0,0};
+static int offsetIntBack[3] = {0,0,0};
 
 ESP8266WebServer httpServer(80);
 ESP8266HTTPUpdateServer httpUpdater;
@@ -39,11 +34,11 @@ String getServerPage() {
 			String("<!DOCTYPE html><head><meta name='viewport' content='width = device-width, initial-scale = 1.0'><title>RosiRolläden</title></head><body>") +
 			"<style> .win{width: 100px; float:left; background-color: #23c5de; margin:5px;} .shutter{background-color: #83c5de; border-bottom-style: solid;border-bottom-width: 3px;}</style>" +
 			"<a href='/rolladen'>Reload Page</a><br>" +
-			"<div id='r3' class='win' style='height: 300px;'><div class='shutter' style='height: " + String(r3offsetIntBack) +"px;'></div></div>" +
+			"<div id='r3' class='win' style='height: 300px;'><div class='shutter' style='height: " + String(offsetIntBack[2]) +"px;'></div></div>" +
 			"<script>document.getElementById('r3').addEventListener('click', function(e){document.location='/rolladen?id=r3&offset=' + e.offsetY})</script>" +
-			"<div id='r1' class='win' style='height: 300px;'><div class='shutter' style='height: " + String(r1offsetIntBack) +"px;'></div></div>" +
+			"<div id='r1' class='win' style='height: 300px;'><div class='shutter' style='height: " + String(offsetIntBack[0]) +"px;'></div></div>" +
 			"<script>document.getElementById('r1').addEventListener('click', function(e){document.location='/rolladen?id=r1&offset=' + e.offsetY})</script>" +
-			"<div id='r2' class='win' style='height: 200px;'><div class='shutter' style='height: " + String(r2offsetIntBack) +"px;'></div></div>" +
+			"<div id='r2' class='win' style='height: 200px;'><div class='shutter' style='height: " + String(offsetIntBack[1]) +"px;'></div></div>" +
 			"<script>document.getElementById('r2').addEventListener('click', function(e){document.location='/rolladen?id=r2&offset=' + e.offsetY})</script>" +
 			"<br style='clear:both'> Version 7"
 			"</body>";
@@ -53,18 +48,13 @@ String getServerPage() {
 void setup(void) {
 	pinMode(ledPin, OUTPUT);
 	digitalWrite(ledPin, HIGH);
-	pinMode(r1UpPin, OUTPUT);
-	pinMode(r1DownPin, OUTPUT);
-	digitalWrite(r1UpPin, HIGH);
-	digitalWrite(r1DownPin, HIGH);
-	pinMode(r2UpPin, OUTPUT);
-	pinMode(r2DownPin, OUTPUT);
-	digitalWrite(r2UpPin, HIGH);
-	digitalWrite(r2DownPin, HIGH);
-	pinMode(r3UpPin, OUTPUT);
-	pinMode(r3DownPin, OUTPUT);
-	digitalWrite(r3UpPin, HIGH);
-	digitalWrite(r3DownPin, HIGH);
+
+	for (int rolIndex = 0; rolIndex < 3; rolIndex++) {
+		pinMode(upPin[rolIndex], OUTPUT);
+		pinMode(downPin[rolIndex], OUTPUT);
+		digitalWrite(upPin[rolIndex], HIGH);
+		digitalWrite(downPin[rolIndex], HIGH);
+	}
 
 	Serial.begin(115200);
 	Serial.println();
@@ -86,37 +76,16 @@ void setup(void) {
 		String offset = httpServer.arg("offset");
 		Serial.println(String("Rolladen") + rolladenNr + " Offset " + offset);
 
+		int rolladenNrIndex = rolladenNr.substring(1, 1).toInt() - 1;
 		unsigned long currentTime = millis();
-		if(rolladenNr == "r1") {
-			int r1offsetInt = offset.toInt();
-			int delta = r1offsetInt - r1offsetIntBack;
-			if(delta > 0) {
-				stopTimeR1Down = currentTime + 1000L * map(delta, 0, 300, 0, 25);
-			} else {
-				stopTimeR1Up = currentTime + 1000L * map(delta, 0, 300, 0, 25) * 1.1 * -1;
-			}
-			r1offsetIntBack = r1offsetInt;
+		int offsetInt = offset.toInt();
+		int delta = offsetInt - offsetIntBack[rolladenNrIndex];
+		if(delta > 0) {
+			stopTimeDown[rolladenNrIndex] = currentTime + 1000L * map(delta, 0, 300, 0, 25);
+		} else {
+			stopTimeUp[rolladenNrIndex] = currentTime + 1000L * map(delta, 0, 300, 0, 25) * 1.1 * -1;
 		}
-		if(rolladenNr == "r2") {
-			int r2offsetInt = offset.toInt();
-			int delta = r2offsetInt - r2offsetIntBack;
-			if(delta > 0) {
-				stopTimeR2Down = currentTime + 1000L * map(delta, 0, 300, 0, 25);
-			} else {
-				stopTimeR2Up = currentTime + 1000L * map(delta, 0, 300, 0, 25) * 1.1 * -1;
-			}
-			r2offsetIntBack = r2offsetInt;
-		}
-		if(rolladenNr == "r3") {
-			int r3offsetInt = offset.toInt();
-			int delta = r3offsetInt - r3offsetIntBack;
-			if(delta > 0) {
-				stopTimeR3Down = currentTime + 1000L * map(delta, 0, 300, 0, 25);
-			} else {
-				stopTimeR3Up = currentTime + 1000L * map(delta, 0, 300, 0, 25) * 1.1 * -1;
-			}
-			r3offsetIntBack = r3offsetInt;
-		}
+		offsetIntBack[rolladenNrIndex] = offsetInt;
 
 		httpServer.sendHeader("Connection", "close");
 		String page = getServerPage();
@@ -131,90 +100,40 @@ void setup(void) {
 
 void loop(void) {
 	unsigned long currentTime = millis();
-	if (stopTimeR1Up > currentTime) {
-		// R1 up
-		digitalWrite(ledPin, LOW);
-		Serial.println("R1Down off");
-		digitalWrite(r1DownPin, HIGH);
-		delay(100);
-		Serial.println("R1Up on");
-		digitalWrite(r1UpPin, LOW);
-	}
-	else {
-		if (stopTimeR1Down > currentTime) {
-			// R1 down
+	for (int rolIndex = 0; rolIndex < 3; rolIndex++) {
+		if (stopTimeUp[rolIndex] > currentTime) {
+			// Shutter up
 			digitalWrite(ledPin, LOW);
-			Serial.println("R1Up off");
-			digitalWrite(r1UpPin, HIGH);
+			Serial.print(rolIndex);
+			Serial.println(" down off");
+			digitalWrite(downPin[rolIndex], HIGH);
 			delay(100);
-			Serial.println("R1DOwn on");
-			digitalWrite(r1DownPin, LOW);
+			Serial.print(rolIndex);
+			Serial.println(" up on");
+			digitalWrite(upPin[rolIndex], LOW);
 		}
 		else {
-			digitalWrite(ledPin, HIGH);
-			Serial.println("R1Up off");
-			digitalWrite(r1UpPin, HIGH);
-			Serial.println("R1Down off");
-			digitalWrite(r1DownPin, HIGH);
-			delay(100);
-		}
-	}
-
-	if (stopTimeR2Up > currentTime) {
-		// R2 up
-		digitalWrite(ledPin, LOW);
-		Serial.println("R2Down off");
-		digitalWrite(r2DownPin, HIGH);
-		delay(100);
-		Serial.println("R2Up on");
-		digitalWrite(r2UpPin, LOW);
-	}
-	else {
-		if (stopTimeR2Down > currentTime) {
-			// R2 down
-			digitalWrite(ledPin, LOW);
-			Serial.println("R2Up off");
-			digitalWrite(r2UpPin, HIGH);
-			delay(100);
-			Serial.println("R2DOwn on");
-			digitalWrite(r2DownPin, LOW);
-		}
-		else {
-			digitalWrite(ledPin, HIGH);
-			Serial.println("R2Up off");
-			digitalWrite(r2UpPin, HIGH);
-			Serial.println("R2Down off");
-			digitalWrite(r2DownPin, HIGH);
-			delay(100);
-		}
-	}
-
-	if (stopTimeR3Up > currentTime) {
-		// R3 up
-		digitalWrite(ledPin, LOW);
-		Serial.println("R3Down off");
-		digitalWrite(r3DownPin, HIGH);
-		delay(100);
-		Serial.println("R3Up on");
-		digitalWrite(r3UpPin, LOW);
-	}
-	else {
-		if (stopTimeR3Down > currentTime) {
-			// R3 down
-			digitalWrite(ledPin, LOW);
-			Serial.println("R3Up off");
-			digitalWrite(r3UpPin, HIGH);
-			delay(100);
-			Serial.println("R3DOwn on");
-			digitalWrite(r3DownPin, LOW);
-		}
-		else {
-			digitalWrite(ledPin, HIGH);
-			Serial.println("R3Up off");
-			digitalWrite(r3UpPin, HIGH);
-			Serial.println("R3Down off");
-			digitalWrite(r3DownPin, HIGH);
-			delay(100);
+			if (stopTimeDown[rolIndex] > currentTime) {
+				// Shutter down
+				digitalWrite(ledPin, LOW);
+				Serial.print(rolIndex);
+				Serial.println(" up off");
+				digitalWrite(upPin[rolIndex], HIGH);
+				delay(100);
+			Serial.print(rolIndex);
+				Serial.println(" dOwn on");
+				digitalWrite(downPin[rolIndex], LOW);
+			}
+			else {
+				digitalWrite(ledPin, HIGH);
+				Serial.print(rolIndex);
+				Serial.println(" up off");
+				digitalWrite(upPin[rolIndex], HIGH);
+				Serial.print(rolIndex);
+				Serial.println(" down off");
+				digitalWrite(downPin[rolIndex], HIGH);
+				delay(100);
+			}
 		}
 	}
 
