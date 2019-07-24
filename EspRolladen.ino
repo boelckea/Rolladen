@@ -15,33 +15,39 @@ const char* host = "EspRolladen";
 
 const int ledPin = 2;
 
-const int shutterHeightPx[3] = {300, 300, 200};
-const int upPin[3] = {5 /*D1*/,
-		      13 /*D7*/, 
-		      12 /*D6*/};
-const int downPin[3] = {4 /*D2*/,
-			15 /*D8 nur mit 600 Ohm Pulldow extern!*/, 
-			14 /*D5*/};
+const int shutterHeightPx[3] = { 300, 300, 200 };
+const int upPin[3] = { 5 /*D1*/,
+		13 /*D7*/,
+		12 /*D6*/};
+const int downPin[3] = { 4 /*D2*/,
+		15 /*D8 nur mit 600 Ohm Pulldow extern!*/,
+		14 /*D5*/};
 
-static unsigned long stopTimeUp[3] = {0,0,0};
-static unsigned long stopTimeDown[3] = {0,0,0};
-static int offsetIntBack[3] = {0,0,0};
+static unsigned long stopTimeUp[3] = { 0, 0, 0 };
+static unsigned long stopTimeDown[3] = { 0, 0, 0 };
+static int offsetIntBack[3] = { 0, 0, 0 };
 
 ESP8266WebServer httpServer(80);
 ESP8266HTTPUpdateServer httpUpdater;
 
 String getServerPage() {
 	String serverpage =
-		String("<!DOCTYPE html><head><meta name='viewport' content='width = device-width, initial-scale = 1.0'><title>RosiRolläden</title></head><body>") +
-		"<style> .win{width: 100px; float:left; background-color: #23c5de; margin:5px;} .shutter{background-color: #83c5de; border-bottom-style: solid;border-bottom-width: 3px;}</style>" +
-		"<a href='/rolladen'>Reload Page</a><br>";
+			String(
+					"<!DOCTYPE html><head><meta name='viewport' content='width = device-width, initial-scale = 1.0'><title>RosiRolläden</title></head><body>")
+					+
+					"<style> .win{width: 100px; float:left; background-color: #23c5de; margin:5px;} .shutter{background-color: #83c5de; border-bottom-style: solid;border-bottom-width: 3px;}</style>"
+					+
+					"<a href='/rolladen'>Reload Page</a><br>";
 
-		for (int rolIndex = 0; rolIndex < 3; rolIndex++) {
-			serverpage += String("<div id='r") + String(rolIndex) + "' class='win' style='height: " + String(shutterHeightPx[rolIndex]) + "px;'><div class='shutter' style='height: " + String(offsetIntBack[2]) +"px;'></div></div>" +
-				      "<script>document.getElementById('r" + String(rolIndex) + "').addEventListener('click', function(e){document.location='/rolladen?id=r" + String(rolIndex) + "&offset=' + e.offsetY})</script>";
-		}
+	for (int rolIndex = 0; rolIndex < 3; rolIndex++) {
+		serverpage += String("<div id='r") + String(rolIndex) + "' class='win' style='height: " + String(shutterHeightPx[rolIndex])
+				+ "px;'><div class='shutter' style='height: " + String(offsetIntBack[rolIndex]) + "px;'></div></div>" +
+				"<script>document.getElementById('r" + String(rolIndex)
+				+ "').addEventListener('click', function(e){document.location='/rolladen?id=r" + String(rolIndex)
+				+ "&offset=' + e.offsetY})</script>";
+	}
 
-		serverpage += String("<br style='clear:both'> Version 7 </body>");
+	serverpage += String("<br style='clear:both'> Version 8 </body>");
 	return serverpage;
 }
 
@@ -77,15 +83,17 @@ void setup(void) {
 		Serial.println(String("Rolladen") + rolladenNr + " Offset " + offset);
 
 		int rolladenNrIndex = rolladenNr.substring(1, 1).toInt() - 1;
-		unsigned long currentTime = millis();
-		int offsetInt = offset.toInt();
-		int delta = offsetInt - offsetIntBack[rolladenNrIndex];
-		if(delta > 0) {
-			stopTimeDown[rolladenNrIndex] = currentTime + 1000L * map(delta, 0, 300, 0, 25) * 1.1;
-		} else {
-			stopTimeUp[rolladenNrIndex] = currentTime + 1000L * map(delta, 0, 300, 0, 25) * 1.1 * -1 * 1.1;
+		if(rolladenNrIndex > -1 && rolladenNrIndex < 3) {
+			unsigned long currentTime = millis();
+			int offsetInt = offset.toInt();
+			int delta = offsetInt - offsetIntBack[rolladenNrIndex];
+			if(delta > 0) {
+				stopTimeDown[rolladenNrIndex] = currentTime + 1000L * map(delta, 0, 300, 0, 25) * 1.1;
+			} else {
+				stopTimeUp[rolladenNrIndex] = currentTime + 1000L * map(delta, 0, 300, 0, 25) * 1.1 * -1 * 1.1;
+			}
+			offsetIntBack[rolladenNrIndex] = offsetInt;
 		}
-		offsetIntBack[rolladenNrIndex] = offsetInt;
 
 		httpServer.sendHeader("Connection", "close");
 		String page = getServerPage();
