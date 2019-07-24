@@ -104,33 +104,27 @@ void loop(void) {
 		if (stopTimeUp[rolIndex] > currentTime) {
 			// Shutter up
 			digitalWrite(ledPin, LOW);
-			Serial.print(rolIndex);
-			Serial.println(" down off");
+			Serial.println(String(rolIndex) + " down off");
 			digitalWrite(downPin[rolIndex], HIGH);
 			delay(100);
-			Serial.print(rolIndex);
-			Serial.println(" up on");
+			Serial.println(String(rolIndex) + " up on");
 			digitalWrite(upPin[rolIndex], LOW);
 		}
 		else {
 			if (stopTimeDown[rolIndex] > currentTime) {
 				// Shutter down
 				digitalWrite(ledPin, LOW);
-				Serial.print(rolIndex);
-				Serial.println(" up off");
+				Serial.println(String(rolIndex) + " up off");
 				digitalWrite(upPin[rolIndex], HIGH);
 				delay(100);
-				Serial.print(rolIndex);
-				Serial.println(" dOwn on");
+				Serial.println(String(rolIndex) + " dOwn on");
 				digitalWrite(downPin[rolIndex], LOW);
 			}
 			else {
 				digitalWrite(ledPin, HIGH);
-				Serial.print(rolIndex);
-				Serial.println(" up off");
+				Serial.println(String(rolIndex) + " up off");
 				digitalWrite(upPin[rolIndex], HIGH);
-				Serial.print(rolIndex);
-				Serial.println(" down off");
+				Serial.println(String(rolIndex) + " down off");
 				digitalWrite(downPin[rolIndex], HIGH);
 				delay(100);
 			}
