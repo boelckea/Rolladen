@@ -15,12 +15,13 @@ const char* host = "EspRolladen";
 
 const int ledPin = 2;
 
-const int upPin[3] = {13 /*D7*/, 
-		      12 /*D6*/, 
-		      5 /*D1*/};
-const int downPin[3] = {15 /*D8 nur mit 600 Ohm Pulldow extern!*/, 
-			14 /*D5*/, 
-			4 /*D2*/};
+const int shutterHeightPx[3] = {300, 300, 200};
+const int upPin[3] = {5 /*D1*/,
+		      13 /*D7*/, 
+		      12 /*D6*/};
+const int downPin[3] = {4 /*D2*/,
+			15 /*D8 nur mit 600 Ohm Pulldow extern!*/, 
+			14 /*D5*/};
 
 static unsigned long stopTimeUp[3] = {0,0,0};
 static unsigned long stopTimeDown[3] = {0,0,0};
@@ -31,17 +32,16 @@ ESP8266HTTPUpdateServer httpUpdater;
 
 String getServerPage() {
 	String serverpage =
-			String("<!DOCTYPE html><head><meta name='viewport' content='width = device-width, initial-scale = 1.0'><title>RosiRolläden</title></head><body>") +
-			"<style> .win{width: 100px; float:left; background-color: #23c5de; margin:5px;} .shutter{background-color: #83c5de; border-bottom-style: solid;border-bottom-width: 3px;}</style>" +
-			"<a href='/rolladen'>Reload Page</a><br>" +
-			"<div id='r3' class='win' style='height: 300px;'><div class='shutter' style='height: " + String(offsetIntBack[2]) +"px;'></div></div>" +
-			"<script>document.getElementById('r3').addEventListener('click', function(e){document.location='/rolladen?id=r3&offset=' + e.offsetY})</script>" +
-			"<div id='r1' class='win' style='height: 300px;'><div class='shutter' style='height: " + String(offsetIntBack[0]) +"px;'></div></div>" +
-			"<script>document.getElementById('r1').addEventListener('click', function(e){document.location='/rolladen?id=r1&offset=' + e.offsetY})</script>" +
-			"<div id='r2' class='win' style='height: 200px;'><div class='shutter' style='height: " + String(offsetIntBack[1]) +"px;'></div></div>" +
-			"<script>document.getElementById('r2').addEventListener('click', function(e){document.location='/rolladen?id=r2&offset=' + e.offsetY})</script>" +
-			"<br style='clear:both'> Version 7"
-			"</body>";
+		String("<!DOCTYPE html><head><meta name='viewport' content='width = device-width, initial-scale = 1.0'><title>RosiRolläden</title></head><body>") +
+		"<style> .win{width: 100px; float:left; background-color: #23c5de; margin:5px;} .shutter{background-color: #83c5de; border-bottom-style: solid;border-bottom-width: 3px;}</style>" +
+		"<a href='/rolladen'>Reload Page</a><br>";
+
+		for (int rolIndex = 0; rolIndex < 3; rolIndex++) {
+			serverpage += String("<div id='r") + String(rolIndex) + "' class='win' style='height: " + String(shutterHeightPx[rolIndex]) + "px;'><div class='shutter' style='height: " + String(offsetIntBack[2]) +"px;'></div></div>" +
+				      "<script>document.getElementById('r" + String(rolIndex) + "').addEventListener('click', function(e){document.location='/rolladen?id=r" + String(rolIndex) + "&offset=' + e.offsetY})</script>";
+		}
+
+		serverpage += String("<br style='clear:both'> Version 7 </body>");
 	return serverpage;
 }
 
