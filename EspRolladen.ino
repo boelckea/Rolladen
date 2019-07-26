@@ -47,7 +47,7 @@ String getServerPage() {
 				+ "&offset=' + e.offsetY})</script>";
 	}
 
-	serverpage += String("<br style='clear:both'> {DATE:2019-07-25 16:55} </body>");
+	serverpage += String("<br style='clear:both'> <span id='commitdate'></span> </body>");
 	return serverpage;
 }
 
